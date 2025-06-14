@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bamboo & Marbles Challenge</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      font-family: 'Arial', sans-serif;
+      color: #e0e0e0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .retro-grain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAVSURBVBhXY2BgYGBoYGBgYGD4DwAA1wECr7L+4gAAAABJRU5ErkJggg==');
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .press-start {
+      font-family: 'Press Start 2P', cursive;
+    }
+    .neon-text {
+      text-shadow: 0 0 10px #ff6ec7, 0 0 20px #ff6ec7, 0 0 30px #00f7ff;
+    }
+    .nav-link {
+      position: relative;
+      color: #e0e0e0;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(45deg, #ff6ec7, #00f7ff);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+    .nav-link.active {
+      color: #ff6ec7;
+    }
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+    .hero-button {
+      background: linear-gradient(45deg, #ff6ec7, #00f7ff);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: 0.5s;
+    }
+    .hero-button:hover::before {
+      left: 100%;
+    }
+    .hero-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 247, 255, 0.4);
+    }
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+    .glow {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 5px #ff6ec7, 0 0 10px #ff6ec7, 0 0 15px #00f7ff;
+      }
+      to {
+        box-shadow: 0 0 10px #ff6ec7, 0 0 20px #ff6ec7, 0 0 30px #00f7ff;
+      }
+    }
+    .slide-in {
+      animation: slideIn 1s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .marble-shine {
+      position: relative;
+    }
+    .marble-shine::after {
+      content: '✨';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 1.5rem;
+      animation: twinkle 1.5s ease-in-out infinite;
+      z-index: 1;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+    .marble {
+      display: inline-block;
+      background: linear-gradient(135deg, #86f7ff 0%, #42a1ff 50%, #0066cc 100%);
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      position: relative;
+      box-shadow: 
+        inset -2px -2px 4px rgba(0,0,0,0.3),
+        inset 2px 2px 4px rgba(255,255,255,0.8),
+        0 0 10px #42a1ff,
+        0 0 20px #86f7ff;
+    }
+    .marble::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 10px;
+      height: 10px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      filter: blur(2px);
+    }
+    .bamboo-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: bottom;
+    }
+    .bamboo-stalk {
+      position: relative;
+      width: 60px;
+      height: 300px;
+      background: linear-gradient(90deg, 
+        #76b82a 0%, 
+        #9dd43f 25%,
+        #c1e065 50%,
+        #9dd43f 75%,
+        #76b82a 100%
+      );
+      border-radius: 30px;
+      box-shadow: 
+        -4px 0 8px rgba(0,0,0,0.2),
+        4px 0 8px rgba(0,0,0,0.1),
+        0 4px 8px rgba(0,0,0,0.1);
+    }
+    .bamboo-node {
+      position: absolute;
+      width: 100%;
+      height: 12px;
+      background: #567d1e;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .bamboo-node::before {
+      content: '';
+      position: absolute;
+      width: 90%;
+      height: 2px;
+      background: rgba(255,255,255,0.3);
+      top: 2px;
+      left: 5%;
+      border-radius: 1px;
+    }
+    .bamboo-leaves {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .bamboo-leaf {
+      position: absolute;
+      width: 120px;
+      height: 40px;
+      background: linear-gradient(90deg, #76b82a, #9dd43f);
+      border-radius: 100% 0 100% 0;
+      transform-origin: 0 50%;
+      box-shadow: 
+        0 2px 4px rgba(0,0,0,0.1),
+        inset 0 -2px 4px rgba(0,0,0,0.1);
+    }
+    .bamboo-leaf::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: rgba(255,255,255,0.2);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .game-arena {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: linear-gradient(45deg, rgba(255,110,199,0.1), rgba(0,247,255,0.1));
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .game-path {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,110,199,0.2) 20%,
+        rgba(0,247,255,0.2) 80%,
+        transparent 100%
+      );
+      transform: translateY(-50%);
+    }
+    .game-path::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg,
+        transparent,
+        rgba(255,255,255,0.2),
+        transparent
+      );
+      animation: pathLight 3s linear infinite;
+    }
+    @keyframes pathLight {
+      to { left: 100%; }
+    }
+    .game-element {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      animation: float 3s ease-in-out infinite;
+    }
+    .game-element::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 20px currentColor;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+    .pixel-text {
+      font-family: 'Press Start 2P', cursive;
+      position: absolute;
+      color: #fff;
+      text-shadow: 0 0 10px currentColor;
+      animation: float 3s ease-in-out infinite;
+    }
+    .challenge-text {
+      position: absolute;
+      font-size: 0.8rem;
+      opacity: 0;
+      animation: fadeInOut 4s linear infinite;
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; transform: translateY(20px); }
+      50% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const Navbar = () => {
+      return (
+        <nav className="fixed top-0 left-0 right-0 bg-gray-900 bg-opacity-90 shadow-lg z-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex justify-between items-center py-4">
+              <div className="flex items-center">
+                <a href="index.html" className="hover:opacity-80 transition-opacity">
+                  <h1 className="text-xl press-start text-[#ff6ec7] cursor-pointer">
+                    B&M Challenge
+                  </h1>
+                </a>
+              </div>
+              <div className="flex space-x-8">
+                <a href="scorecard.html" className="nav-link press-start text-sm">
+                  Scorecard
+                </a>
+
+                <a href="rules.html" className="nav-link press-start text-sm">
+                  Game Rules
+                </a>
+                <a href="about.html" className="nav-link press-start text-sm">
+                  About
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      );
+    };
+
+    const App = () => {
+      return (
+        <div className="min-h-screen flex flex-col relative z-10">
+          <div className="retro-grain"></div>
+          <Navbar />
+          
+          {/* Hero Section */}
+          <div className="flex flex-col md:flex-row items-center justify-center min-h-screen px-4 py-20">
+            <div className="md:w-1/2 text-center md:text-left md:pr-8 slide-in" style={{ animationDelay: '0.2s' }}>
+              <h1 className="text-4xl md:text-6xl press-start neon-text mb-8">
+                Bamboo & Marbles Challenge
+              </h1>
+              <p className="text-xl mb-8 text-gray-300">
+                Experience the ultimate team-building adventure where coordination, balance, and teamwork collide in an exciting challenge!
+              </p>
+              <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
+                <a
+                  href="scorecard.html"
+                  className="hero-button text-white px-8 py-4 rounded-lg press-start text-lg"
+                >
+                  Start Scoring
+                </a>
+                <a
+                  href="rules.html"
+                  className="hero-button text-white px-8 py-4 rounded-lg press-start text-lg"
+                >
+                  Learn Rules
+                </a>
+              </div>
+            </div>
+            
+            {/* Visual Elements */}
+            <div className="md:w-1/2 mt-12 md:mt-0 slide-in" style={{ animationDelay: '0.4s' }}>
+              <div className="game-arena">
+                <div className="game-path"></div>
+                
+                {/* Interactive Elements */}
+                <div className="game-element" style={{ 
+                  top: '30%', 
+                  left: '20%', 
+                  backgroundColor: '#ff6ec7',
+                  color: '#ff6ec7',
+                  animationDelay: '0s' 
+                }}></div>
+                
+                <div className="game-element" style={{ 
+                  top: '60%', 
+                  left: '70%', 
+                  backgroundColor: '#00f7ff',
+                  color: '#00f7ff',
+                  animationDelay: '0.5s' 
+                }}></div>
+
+                {/* Challenge Text */}
+                <div className="pixel-text" style={{ 
+                  top: '20%', 
+                  left: '40%',
+                  color: '#ff6ec7',
+                  animationDelay: '1s'
+                }}>Balance</div>
+
+                <div className="pixel-text" style={{ 
+                  bottom: '20%', 
+                  right: '30%',
+                  color: '#00f7ff',
+                  animationDelay: '1.5s'
+                }}>Teamwork</div>
+                
+                {/* Challenge Messages */}
+                <div className="challenge-text" style={{ 
+                  top: '40%', 
+                  left: '50%', 
+                  transform: 'translate(-50%, -50%)',
+                  animationDelay: '0s',
+                  color: '#ff6ec7' 
+                }}>Keep Steady...</div>
+
+                <div className="challenge-text" style={{ 
+                  bottom: '40%', 
+                  left: '50%', 
+                  transform: 'translate(-50%, 50%)',
+                  animationDelay: '2s',
+                  color: '#00f7ff' 
+                }}>Work Together!</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Features Section */}
+          <div className="bg-gray-900 bg-opacity-80 py-20 px-4">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-3xl press-start text-center mb-12 neon-text slide-in" style={{ animationDelay: '0.6s' }}>
+                Game Features
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="p-6 bg-gray-800 bg-opacity-50 rounded-lg slide-in" style={{ animationDelay: '0.8s' }}>
+                  <div className="text-4xl mb-4">🤝</div>
+                  <h3 className="text-xl press-start text-[#ff6ec7] mb-4">Team Building</h3>
+                  <p className="text-gray-300">Build strong team bonds through exciting challenges and shared goals.</p>
+                </div>
+                <div className="p-6 bg-gray-800 bg-opacity-50 rounded-lg slide-in" style={{ animationDelay: '1s' }}>
+                  <div className="text-4xl mb-4">🎯</div>
+                  <h3 className="text-xl press-start text-[#ff6ec7] mb-4">Precision</h3>
+                  <p className="text-gray-300">Test your balance and coordination skills in this unique challenge.</p>
+                </div>
+                <div className="p-6 bg-gray-800 bg-opacity-50 rounded-lg slide-in" style={{ animationDelay: '1.2s' }}>
+                  <div className="text-4xl mb-4">🏆</div>
+                  <h3 className="text-xl press-start text-[#ff6ec7] mb-4">Competition</h3>
+                  <p className="text-gray-300">Compete with other teams and track your progress on the scorecard.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer className="bg-gray-900 py-8 text-center text-gray-400">
+            <p>© 2025 Bamboo & Marbles Challenge. All rights reserved.</p>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html> 

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bamboo & Marbles Challenge - Game Rules</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      font-family: 'Arial', sans-serif;
+      color: #e0e0e0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .retro-grain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAVSURBVBhXY2BgYGBoYGBgYGD4DwAA1wECr7L+4gAAAABJRU5ErkJggg==');
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .press-start {
+      font-family: 'Press Start 2P', cursive;
+    }
+    .neon-text {
+      text-shadow: 0 0 10px #ff6ec7, 0 0 20px #ff6ec7, 0 0 30px #00f7ff;
+    }
+    .nav-link {
+      position: relative;
+      color: #e0e0e0;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(45deg, #ff6ec7, #00f7ff);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+    .nav-link.active {
+      color: #ff6ec7;
+    }
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const Navbar = () => {
+      return (
+        <nav className="fixed top-0 left-0 right-0 bg-gray-900 bg-opacity-90 shadow-lg z-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex justify-between items-center py-4">
+              <div className="flex items-center">
+                <a href="index.html" className="hover:opacity-80 transition-opacity">
+                  <h1 className="text-xl press-start text-[#ff6ec7] cursor-pointer">
+                    B&M Challenge
+                  </h1>
+                </a>
+              </div>
+              <div className="flex space-x-8">
+                <a href="scorecard.html" className="nav-link press-start text-sm">
+                  Scorecard
+                </a>
+                <a href="rules.html" className="nav-link active press-start text-sm">
+                  Game Rules
+                </a>
+                <a href="about.html" className="nav-link press-start text-sm">
+                  About
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      );
+    };
+
+    const App = () => {
+      return (
+        <div className="min-h-screen flex flex-col items-center pt-24 p-4 relative z-10">
+          <div className="retro-grain"></div>
+          <Navbar />
+          
+          <h1 className="text-4xl md:text-6xl press-start neon-text text-center mb-8">
+            Game Rules
+          </h1>
+
+          <div className="w-full max-w-4xl bg-gray-900 bg-opacity-80 rounded-lg shadow-lg p-6">
+            <div className="space-y-6">
+              {/* Overview */}
+              <p className="text-lg">
+                The Bamboo and Marbles Challenge is a team-based game where 5 members navigate a zigzag path, balancing marbles on a spoon held in their mouth while carrying bamboo poles. The goal is to deposit marbles into a cup at the finish line within 120 seconds.
+              </p>
+
+              {/* Starting Position */}
+              <div>
+                <h3 className="text-xl text-[#00f7ff] mb-2">Starting Position</h3>
+                <ul className="list-disc list-inside text-lg space-y-1">
+                  <li>All team members stand at the starting line.</li>
+                  <li>Each member holds a spoon in their mouth with marbles balanced on it.</li>
+                  <li>The bamboo poles are on the ground, and each team member must use both hands to pick them up when the whistle blows.</li>
+                </ul>
+              </div>
+
+              {/* Game Start */}
+              <div>
+                <h3 className="text-xl text-[#00f7ff] mb-2">Game Start</h3>
+                <ul className="list-disc list-inside text-lg space-y-1">
+                  <li>The game begins when the whistle is blown, and the timer starts.</li>
+                  <li>Teams must pick up the two bamboo poles from the ground, with each member using both hands to hold the poles.</li>
+                </ul>
+              </div>
+
+              {/* Navigating the Path */}
+              <div>
+                <h3 className="text-xl text-[#00f7ff] mb-2">Navigating the Path</h3>
+                <ul className="list-disc list-inside text-lg space-y-1">
+                  <li>Teams must navigate the zigzag path while balancing marbles on their spoons and carrying the bamboo poles.</li>
+                  <li>The path includes obstacles that must not be touched.</li>
+                  <li>If a team member drops a marble, it cannot be picked up, and only the remaining marbles count toward the score.</li>
+                </ul>
+              </div>
+
+              {/* Final Obstacle */}
+              <div>
+                <h3 className="text-xl text-[#00f7ff] mb-2">Final Obstacle</h3>
+                <ul className="list-disc list-inside text-lg space-y-1">
+                  <li>At the finish line, teams place the bamboo poles on the ground.</li>
+                  <li>Each team member deposits their remaining marbles into the cup.</li>
+                  <li>The timer stops when all team members have placed their marbles in the cup or when the 120-second time limit is reached.</li>
+                </ul>
+              </div>
+
+              {/* Time Limit */}
+              <div>
+                <h3 className="text-xl text-[#00f7ff] mb-2">Time Limit</h3>
+                <ul className="list-disc list-inside text-lg space-y-1">
+                  <li>Teams must complete the course within 120 seconds.</li>
+                  <li>If a team fails to complete the course within 120 seconds, their marble count is recorded as 0, and only their completion time (or 120 seconds if incomplete) is considered for scoring.</li>
+                </ul>
+              </div>
+
+              {/* Penalties */}
+              <div>
+                <h3 className="text-xl text-[#00f7ff] mb-2">Penalties</h3>
+                <ul className="list-disc list-inside text-lg space-y-1">
+                  <li>Touching any obstacle incurs a 5-second penalty added to the team's completion time.</li>
+                  <li>Penalties are cumulative (e.g., touching two obstacles results in a 10-second penalty).</li>
+                </ul>
+              </div>
+
+              {/* Scoring */}
+              <div>
+                <h3 className="text-xl text-[#00f7ff] mb-2">Scoring</h3>
+                <ul className="list-disc list-inside text-lg space-y-1">
+                  <li>Teams are ranked first by the number of marbles successfully deposited.</li>
+                  <li>For teams with equal marbles, ranking is determined by total time (including penalties).</li>
+                  <li>Points are awarded based on final ranking:</li>
+                  <ul className="list-none ml-6 mt-2 space-y-1">
+                    <li>1st Place: 15 points</li>
+                    <li>2nd Place: 12 points</li>
+                    <li>3rd Place: 10 points</li>
+                    <li>4th Place: 8 points</li>
+                    <li>5th Place: 6 points</li>
+                    <li>6th Place: 4 points</li>
+                    <li>7th-8th Place: 2 points</li>
+                    <li>9th-12th Place: 1 point</li>
+                  </ul>
+                  <li className="mt-2">Maximum of 12 teams can participate in the challenge.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <footer className="mt-8 text-center text-gray-400">
+            <p>© 2025 Bamboo & Marbles Challenge. All rights reserved.</p>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html> 

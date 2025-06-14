@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coordination Challenge - Bamboo Balance</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    
+    :root {
+      --primary: #2C5F2D;
+      --secondary: #97BC62;
+      --accent: #FFE77A;
+      --background: #1a1a1a;
+      --text: #ffffff;
+    }
+    
+    body {
+      background: var(--background);
+      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .gradient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #2C5F2D 0%, #1a1a1a 100%);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .press-start {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+    }
+
+    .glow-text {
+      text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+      color: var(--text);
+    }
+
+    .scoreboard-row:hover {
+      background-color: rgba(44, 95, 45, 0.2);
+      transform: scale(1.01);
+      transition: all 0.3s ease;
+    }
+
+    .custom-button {
+      background: var(--primary);
+      color: var(--text);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+      border: 2px solid var(--secondary);
+    }
+
+    .custom-button:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(151, 188, 98, 0.4);
+    }
+
+    .nav-link {
+      position: relative;
+      color: var(--text);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+    }
+
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    input, select {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid var(--secondary) !important;
+      color: var(--text) !important;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 10px var(--secondary);
+    }
+
+    /* Add new styles for dropdown options */
+    select option {
+      background-color: var(--background);
+      color: var(--text);
+    }
+
+    select::-ms-expand {
+      display: none;
+    }
+
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2397BC62' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.7em top 50%;
+      background-size: 1em auto;
+      padding-right: 2.5em;
+    }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    th {
+      color: var(--accent) !important;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      background: rgba(44, 95, 45, 0.2);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(151, 188, 98, 0.2) !important;
+    }
+
+    .score-highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(151, 188, 98, 0.2);
+      border-radius: 15px;
+    }
+
+    .slide-in {
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo-spin {
+      animation: spin 20s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="geometric-shape circle"></div>
+  <div class="geometric-shape triangle"></div>
+  <div class="geometric-shape square"></div>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const calculateTotalTime = (time, penalties) => {
+      return Number(time) + (Number(penalties) * 10);
+    };
+
+    const formatCSVField = (field) => {
+      if (field === null || field === undefined) return '';
+      const stringField = String(field);
+      if (stringField.includes('"') || stringField.includes(',') || stringField.includes('\n')) {
+        return `"${stringField.replace(/"/g, '""')}"`;
+      }
+      return stringField;
+    };
+
+    const exportToPDF = (teams, calculateTotalTime) => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      // Set white background for full A4 page
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 0, 210, 297, 'F');
+
+      // Add main title with better positioning for A4
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('COORDINATION CHALLENGE', doc.internal.pageSize.width / 2, 20, { align: 'center' });
+      doc.setFontSize(16);
+      doc.text('BAMBOO BALANCE', doc.internal.pageSize.width / 2, 30, { align: 'center' });
+
+      // Calculate margins for better A4 layout
+      const pageWidth = doc.internal.pageSize.width;
+      const margins = {
+        left: 10,
+        right: 10
+      };
+      const tableWidth = pageWidth - margins.left - margins.right;
+
+      // Create table with consistent styling
+      doc.autoTable({
+        startY: 40,
+        margin: { left: margins.left },
+        head: [['Rank', 'Team', 'Marbles', 'Time', 'Penalties', 'Total', 'Points']],
+        body: teams.map((team, index) => [
+          (index + 1).toString(),
+          team.name,
+          team.marbles,
+          team.time,
+          team.penalties,
+          calculateTotalTime(team.time, team.penalties),
+          team.points
+        ]),
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: { top: 4, right: 3, bottom: 4, left: 3 },
+          halign: 'center',
+          valign: 'middle',
+          minCellHeight: 12,
+          lineWidth: 0.1,
+          lineColor: [80, 80, 80]
+        },
+        headStyles: {
+          fillColor: [128, 0, 0],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 11,
+          minCellHeight: 16,
+          cellPadding: { top: 6, right: 3, bottom: 6, left: 3 },
+          valign: 'middle'
+        },
+        columnStyles: {
+          0: { cellWidth: 18 },   // Rank
+          1: { cellWidth: 60 },   // Team
+          2: { cellWidth: 23 },   // Marbles
+          3: { cellWidth: 23 },   // Time
+          4: { cellWidth: 23 },   // Penalties
+          5: { cellWidth: 23 },   // Total
+          6: { cellWidth: 20 }    // Points
+        },
+        didParseCell: function(data) {
+          // Center align all cells
+          data.cell.styles.halign = 'center';
+          
+          // Header row styling
+          if (data.row.index === 0) {
+            data.cell.styles.whiteSpace = 'nowrap';
+            data.cell.styles.fontSize = 11;
+            data.cell.styles.cellPadding = { top: 6, right: 3, bottom: 6, left: 3 };
+            data.cell.styles.minCellHeight = 16;
+          }
+          
+          // Style for all data cells
+          if (data.row.index > 0) {
+            // Base styles for all data cells
+            data.cell.styles.fontSize = 10;
+            data.cell.styles.font = 'helvetica';
+            data.cell.styles.cellPadding = { top: 5, right: 3, bottom: 5, left: 3 };
+            data.cell.styles.minCellHeight = 14;
+            
+            // Special styling for team names column
+            if (data.column.index === 1) {  // Updated index for team names
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fillColor = [245, 245, 245];
+            }
+            
+            // Special styling for rank column
+            if (data.column.index === 0) {  // Updated index for rank
+              data.cell.styles.cellPadding = { top: 6, right: 4, bottom: 6, left: 4 };
+            }
+          }
+        },
+        // Add spacing between header and first row
+        didDrawPage: function(data) {
+          // Add extra space after header
+          if (data.cursor && data.cursor.y) {
+            data.cursor.y += 2;
+          }
+        }
+      });
+
+      // Add note about scoring at the bottom with better positioning
+      const bottomMargin = 15;
+      doc.setFontSize(9);
+      doc.setTextColor(60, 60, 60);
+      doc.text('Note: Total Time = Time + (Penalties × 10 seconds)', margins.left, doc.internal.pageSize.height - bottomMargin);
+
+      // Save PDF
+      doc.save('coordination-challenge-scorecard.pdf');
+    };
+
+    const exportToCSV = (teams, calculateTotalTime) => {
+      // Prepare headers with updated column names
+      const headers = [
+        'Rank',
+        'Team Name',
+        'Marbles',
+        'Time (sec)',
+        'Penalties',
+        'Total Time',
+        'Points'
+      ];
+
+      // Format data rows
+      const dataRows = teams.map((team, index) => [
+        index + 1,
+        team.name,
+        team.marbles,
+        team.time,
+        team.penalties,
+        calculateTotalTime(team.time, team.penalties),
+        team.points
+      ].map(formatCSVField));
+
+      // Combine headers and data
+      const csvContent = [
+        headers.map(formatCSVField).join(','),
+        ...dataRows.map(row => row.join(','))
+      ].join('\n');
+      
+      // Create and trigger download
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const date = new Date().toISOString().split('T')[0];
+      link.setAttribute('href', url);
+      link.setAttribute('download', `coordination-challenge-scorecard-${date}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    };
+
+    const App = () => {
+      const [teams, setTeams] = useState(() => {
+        const saved = localStorage.getItem('teams');
+        return saved ? JSON.parse(saved) : [];
+      });
+
+      const [isGeneratingTemplate, setIsGeneratingTemplate] = useState(false);
+
+      // Define the list of available teams
+      const availableTeams = [
+      '404 ERRORS',
+      'CSIT RANGERS',
+      'FLAIR DONZZ',
+      'IT CLUB',
+      'MANIA MASTERS',
+      'PABS',
+      'PANCHAKANYA',
+      'PACH PANDAVS',
+      'SMASH',
+      'STAR',
+      'VICTORY V',
+      'YOUTHOPIA'
+
+      ].map(team => team.toUpperCase());
+
+      const [newTeam, setNewTeam] = useState({
+        name: availableTeams[0],
+        marbles: '',
+        time: '',
+        penalties: ''
+      });
+
+      const [editingTeam, setEditingTeam] = useState(null);
+      const [showRanks, setShowRanks] = useState(false);
+
+      useEffect(() => {
+        localStorage.setItem('teams', JSON.stringify(teams));
+      }, [teams]);
+
+      const handleNewTeamChange = (field, value) => {
+        setNewTeam(prev => ({
+          ...prev,
+          [field]: value
+        }));
+      };
+
+      const handleEditTeamChange = (field, value) => {
+        setEditingTeam(prev => ({
+          ...prev,
+          [field]: value
+        }));
+      };
+
+      const calculatePoints = (sortedTeams) => {
+        return sortedTeams.map((team, index) => {
+          let points;
+          switch (index) {
+            case 0: points = 15; break;  // 1st place
+            case 1: points = 12; break;  // 2nd place
+            case 2: points = 10; break;  // 3rd place
+            case 3: points = 8; break;   // 4th place
+            case 4: points = 6; break;   // 5th place
+            case 5: points = 4; break;   // 6th place
+            case 6:
+            case 7: points = 2; break;   // 7th and 8th place
+            default: points = index < 12 ? 1 : 0; break; // 9th-12th get 1 point, rest get 0
+          }
+          return { ...team, points };
+        });
+      };
+
+      const handleAddTeam = (e) => {
+        e.preventDefault();
+        if (!newTeam.name || !newTeam.marbles || !newTeam.time || !newTeam.penalties) {
+          alert('Please fill in all fields');
+          return;
+        }
+
+        if (teams.length >= 12) {
+          alert('Maximum number of teams (12) reached. Cannot add more teams.');
+          return;
+        }
+
+        // Check if team name already exists
+        if (teams.some(team => team.name === newTeam.name)) {
+          alert('This team has already been added to the scorecard');
+          return;
+        }
+
+        const teamToAdd = {
+          id: Date.now(),
+          name: newTeam.name,
+          marbles: Number(newTeam.marbles),
+          time: Number(newTeam.time),
+          penalties: Number(newTeam.penalties),
+          points: 0
+        };
+
+        const updatedTeams = [...teams, teamToAdd].sort((a, b) => {
+          if (a.marbles !== b.marbles) return b.marbles - a.marbles;
+          return calculateTotalTime(a.time, a.penalties) - calculateTotalTime(b.time, b.penalties);
+        });
+
+        const teamsWithPoints = calculatePoints(updatedTeams);
+        setTeams(teamsWithPoints);
+
+        // Find the next available team name
+        const nextAvailableTeam = availableTeams.find(teamName => 
+          !teamsWithPoints.some(t => t.name === teamName)
+        ) || availableTeams[0];
+
+        setNewTeam({
+          name: nextAvailableTeam,
+          marbles: '',
+          time: '',
+          penalties: ''
+        });
+      };
+
+      const handleEditTeam = (team) => {
+        setEditingTeam(team);
+      };
+
+      const handleSaveEdit = () => {
+        if (!editingTeam.name || !editingTeam.marbles || !editingTeam.time || !editingTeam.penalties) {
+          alert('Please fill in all fields');
+          return;
+        }
+
+        // Check if the new team name already exists (except for the current team)
+        if (teams.some(team => team.name === editingTeam.name && team.id !== editingTeam.id)) {
+          alert('Another team with this name already exists');
+          return;
+        }
+
+        const updatedTeams = teams.map(team => 
+          team.id === editingTeam.id ? {
+            ...editingTeam,
+            name: editingTeam.name,
+            marbles: Number(editingTeam.marbles),
+            time: Number(editingTeam.time),
+            penalties: Number(editingTeam.penalties)
+          } : team
+        ).sort((a, b) => {
+          if (a.marbles !== b.marbles) return b.marbles - a.marbles;
+          return calculateTotalTime(a.time, a.penalties) - calculateTotalTime(b.time, b.penalties);
+        });
+
+        const teamsWithPoints = calculatePoints(updatedTeams);
+        setTeams(teamsWithPoints);
+        setEditingTeam(null);
+      };
+
+      const handleCancelEdit = () => {
+        setEditingTeam(null);
+      };
+
+      const handleDeleteTeam = (teamId) => {
+        if (window.confirm('Are you sure you want to delete this team?')) {
+          const updatedTeams = teams.filter(team => team.id !== teamId);
+          const teamsWithPoints = calculatePoints(updatedTeams);
+          setTeams(teamsWithPoints);
+        }
+      };
+
+      const handleResetGame = () => {
+        if (window.confirm('Are you sure you want to reset the game? This will remove all teams.')) {
+          setTeams([]);
+          localStorage.removeItem('teams');
+        }
+      };
+
+      const exportBlankTemplate = async () => {
+        if (typeof window.jspdf === 'undefined') {
+          alert('PDF generation library is not loaded. Please refresh the page.');
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        try {
+          // Set white background for full A4 page
+          doc.setFillColor(255, 255, 255);
+          doc.rect(0, 0, 210, 297, 'F');
+
+          // Add main title with better positioning for A4
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(18);
+          doc.setFont('helvetica', 'bold');
+          doc.text('COORDINATION CHALLENGE', doc.internal.pageSize.width / 2, 20, { align: 'center' });
+          doc.setFontSize(16);
+          doc.text('BAMBOO BALANCE', doc.internal.pageSize.width / 2, 30, { align: 'center' });
+
+          // Calculate margins for better A4 layout
+          const pageWidth = doc.internal.pageSize.width;
+          const margins = {
+            left: 10,
+            right: 10
+          };
+          const tableWidth = pageWidth - margins.left - margins.right;
+
+          // Create single comprehensive table
+          doc.autoTable({
+            startY: 40,
+            margin: { left: margins.left },
+            head: [['Team', 'Marbles', 'Time', 'Penalties', 'Total', 'Points', 'Rank']],
+            body: availableTeams.map(team => [
+              team,
+              '',
+              '',
+              '',
+              '',
+              '',
+              ''
+            ]),
+            theme: 'grid',
+            styles: {
+              fontSize: 10,
+              cellPadding: { top: 4, right: 3, bottom: 4, left: 3 },
+              halign: 'center',
+              valign: 'middle',
+              minCellHeight: 12,
+              lineWidth: 0.1,
+              lineColor: [80, 80, 80]
+            },
+            headStyles: {
+              fillColor: [128, 0, 0],
+              textColor: [255, 255, 255],
+              fontStyle: 'bold',
+              fontSize: 11,
+              minCellHeight: 16,
+              cellPadding: { top: 6, right: 3, bottom: 6, left: 3 },
+              valign: 'middle'
+            },
+            columnStyles: {
+              0: { cellWidth: 60 },  // Team
+              1: { cellWidth: 23 },  // Marbles
+              2: { cellWidth: 23 },  // Time
+              3: { cellWidth: 23 },  // Penalties
+              4: { cellWidth: 23 },  // Total
+              5: { cellWidth: 20 },  // Points
+              6: { cellWidth: 18 }   // Rank
+            },
+            didParseCell: function(data) {
+              // Center align all cells
+              data.cell.styles.halign = 'center';
+              
+              // Header row styling
+              if (data.row.index === 0) {
+                data.cell.styles.whiteSpace = 'nowrap';
+                data.cell.styles.fontSize = 11;
+                data.cell.styles.cellPadding = { top: 6, right: 3, bottom: 6, left: 3 };
+                data.cell.styles.minCellHeight = 16;
+              }
+              
+              // Style for all data cells
+              if (data.row.index > 0) {
+                // Base styles for all data cells
+                data.cell.styles.fontSize = 10;
+                data.cell.styles.font = 'helvetica';
+                data.cell.styles.cellPadding = { top: 5, right: 3, bottom: 5, left: 3 };
+                data.cell.styles.minCellHeight = 14;
+                
+                // Special styling for team names column
+                if (data.column.index === 0) {
+                  data.cell.styles.fontStyle = 'bold';
+                  data.cell.styles.fillColor = [245, 245, 245];
+                }
+                
+                // Special styling for rank column
+                if (data.column.index === 6) {
+                  data.cell.styles.cellPadding = { top: 6, right: 4, bottom: 6, left: 4 };
+                }
+              }
+            },
+            // Add spacing between header and first row
+            didDrawPage: function(data) {
+              // Add extra space after header
+              if (data.cursor && data.cursor.y) {
+                data.cursor.y += 2;
+              }
+            }
+          });
+
+          // Add note about scoring at the bottom with better positioning
+          const bottomMargin = 15;
+          doc.setFontSize(9);
+          doc.setTextColor(60, 60, 60);
+          doc.text('Note: Total Time = Time + (Penalties × 10 seconds)', margins.left, doc.internal.pageSize.height - bottomMargin);
+
+          // Save the template
+          doc.save('coordination-challenge-scoresheet.pdf');
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+          alert('There was an error generating the PDF. Please try again.');
+        }
+      };
+
+      const handleGenerateTemplate = async () => {
+        setIsGeneratingTemplate(true);
+        try {
+          await exportBlankTemplate();
+        } finally {
+          setIsGeneratingTemplate(false);
+        }
+      };
+
+      const Navbar = () => {
+        return (
+          <nav className="fixed top-0 left-0 right-0 bg-gray-900 bg-opacity-90 shadow-lg z-50">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="flex justify-between items-center py-4">
+                <div className="flex items-center">
+                  <a href="index.html" className="hover:opacity-80 transition-opacity flex items-center gap-3">
+                    <img 
+                      src="logo.png" 
+                      alt="Coordination Challenge Logo" 
+                      className="h-12"
+                    />
+                    <h1 className="text-xl press-start text-[#ff6ec7] cursor-pointer">
+                      Coordination Challenge
+                    </h1>
+                  </a>
+                </div>
+                <div className="flex space-x-8">
+                  <a href="scorecard.html" className="nav-link active press-start text-sm">
+                    Scorecard
+                  </a>
+                  <a href="rules.html" className="nav-link press-start text-sm">
+                    Game Rules
+                  </a>
+                  <a href="about.html" className="nav-link press-start text-sm">
+                    About
+                  </a>
+                </div>
+              </div>
+            </div>
+          </nav>
+        );
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col items-center pt-24 p-4 relative z-10">
+          <div className="gradient-bg"></div>
+          <Navbar />
+          
+          <div className="flex flex-col items-center mb-8">
+            <img 
+              src="logo.png" 
+              alt="Coordination Challenge Logo" 
+              className="h-32 mb-4"
+            />
+            <h1 className="text-4xl md:text-6xl press-start glow-text text-center">
+              Coordination Challenge
+            </h1>
+            <h2 className="text-2xl md:text-3xl press-start text-[var(--accent)] text-center mt-2">
+              Bamboo Balance
+            </h2>
+          </div>
+
+          <div className="w-full max-w-6xl card p-6 mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl press-start glow-text">Scorecard</h2>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => exportToPDF(teams, calculateTotalTime)}
+                  className="custom-button px-6 py-2 rounded-lg"
+                  disabled={teams.length === 0}
+                >
+                  Export PDF
+                </button>
+                <button
+                  onClick={() => exportToCSV(teams, calculateTotalTime)}
+                  className="custom-button px-6 py-2 rounded-lg"
+                  disabled={teams.length === 0}
+                >
+                  Export CSV
+                </button>
+                <button
+                  onClick={handleGenerateTemplate}
+                  className="custom-button px-6 py-2 rounded-lg"
+                  disabled={isGeneratingTemplate}
+                >
+                  {isGeneratingTemplate ? 'Generating...' : 'Blank Template'}
+                </button>
+                <button
+                  onClick={handleResetGame}
+                  className="custom-button bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg"
+                >
+                  Reset Game
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleAddTeam} className="flex flex-wrap gap-4 mb-6">
+              <div className="w-full flex justify-between items-center mb-2">
+                <div className="text-sm text-gray-400">
+                  Teams: {teams.length}/12
+                </div>
+              </div>
+              <select
+                value={newTeam.name}
+                onChange={(e) => handleNewTeamChange('name', e.target.value)}
+                className="p-2 rounded-lg min-w-[200px]"
+              >
+                {availableTeams
+                  .filter(teamName => !teams.some(t => t.name === teamName))
+                  .map(teamName => (
+                    <option key={teamName} value={teamName}>
+                      {teamName}
+                    </option>
+                  ))}
+              </select>
+              <input
+                type="number"
+                placeholder="Marbles"
+                value={newTeam.marbles}
+                onChange={(e) => handleNewTeamChange('marbles', e.target.value)}
+                className="p-2 rounded-lg w-32"
+                min="0"
+              />
+              <input
+                type="number"
+                placeholder="Time (sec)"
+                value={newTeam.time}
+                onChange={(e) => handleNewTeamChange('time', e.target.value)}
+                className="p-2 rounded-lg w-32"
+                min="0"
+              />
+              <input
+                type="number"
+                placeholder="Penalties"
+                value={newTeam.penalties}
+                onChange={(e) => handleNewTeamChange('penalties', e.target.value)}
+                className="p-2 rounded-lg w-32"
+                min="0"
+              />
+              <button
+                type="submit"
+                className="custom-button px-6 py-2 rounded-lg"
+              >
+                Add Team
+              </button>
+            </form>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm md:text-base">
+                <thead>
+                  <tr>
+                    <th className="p-4 press-start rounded-tl-lg">Rank</th>
+                    <th className="p-4 press-start">Team Name</th>
+                    <th className="p-4 press-start">Marbles</th>
+                    <th className="p-4 press-start">Time (sec)</th>
+                    <th className="p-4 press-start">Penalties</th>
+                    <th className="p-4 press-start">Total Time</th>
+                    <th className="p-4 press-start">Points</th>
+                    <th className="p-4 press-start rounded-tr-lg">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teams.map((team, index) => (
+                    <tr key={team.id} className="scoreboard-row">
+                      <td className="p-4">{index + 1}</td>
+                      <td className="p-4">
+                        {editingTeam?.id === team.id ? (
+                          <select
+                            value={editingTeam.name}
+                            onChange={(e) => handleEditTeamChange('name', e.target.value)}
+                            className="p-2 rounded-lg w-full"
+                          >
+                            {availableTeams
+                              .filter(teamName => teamName === team.name || !teams.some(t => t.name === teamName))
+                              .map(teamName => (
+                                <option key={teamName} value={teamName}>
+                                  {teamName}
+                                </option>
+                              ))}
+                          </select>
+                        ) : <div className="truncate">{team.name}</div>}
+                      </td>
+                      <td className="p-4">{team.marbles}</td>
+                      <td className="p-4">{team.time}</td>
+                      <td className="p-4">{team.penalties}</td>
+                      <td className="p-4">{calculateTotalTime(team.time, team.penalties)}</td>
+                      <td className="p-4 score-highlight">{team.points}</td>
+                      <td className="p-4">
+                        {editingTeam?.id === team.id ? (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={handleSaveEdit}
+                              className="text-green-400 hover:text-green-300"
+                              title="Save"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="text-red-400 hover:text-red-300"
+                              title="Cancel"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEditTeam(team)}
+                              className="text-[var(--accent)] hover:text-[var(--secondary)]"
+                              title="Edit"
+                            >
+                              ✎
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTeam(team.id)}
+                              className="text-red-400 hover:text-red-300"
+                              title="Delete"
+                            >
+                              🗑
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="w-full max-w-6xl flex justify-end mt-8 mb-4">
+            <button
+              onClick={() => setShowRanks(!showRanks)}
+              className="custom-button px-8 py-3 rounded-lg text-lg"
+            >
+              {showRanks ? 'Hide Rankings' : 'View Rankings'}
+            </button>
+          </div>
+
+          {showRanks && (
+            <div className="w-full max-w-6xl card p-6 slide-in">
+              <h2 className="text-3xl press-start glow-text mb-6">Rankings</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm md:text-base">
+                  <thead>
+                    <tr>
+                      <th className="p-4 press-start rounded-tl-lg">Rank</th>
+                      <th className="p-4 press-start">Team Name</th>
+                      <th className="p-4 press-start">Marbles</th>
+                      <th className="p-4 press-start">Time (sec)</th>
+                      <th className="p-4 press-start">Penalties</th>
+                      <th className="p-4 press-start">Total Time</th>
+                      <th className="p-4 press-start rounded-tr-lg">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teams.map((team, index) => (
+                      <tr key={team.id} className="scoreboard-row">
+                        <td className="p-4">{index + 1}</td>
+                        <td className="p-4"><div className="truncate">{team.name}</div></td>
+                        <td className="p-4">{team.marbles}</td>
+                        <td className="p-4">{team.time}</td>
+                        <td className="p-4">{team.penalties}</td>
+                        <td className="p-4">{calculateTotalTime(team.time, team.penalties)}</td>
+                        <td className="p-4 score-highlight">{team.points}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <footer className="mt-8 text-center text-gray-400">
+            <p>© 2024 Coordination Challenge - Bamboo Balance. All rights reserved.</p>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html> 

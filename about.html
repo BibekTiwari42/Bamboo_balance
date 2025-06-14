@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bamboo & Marbles Challenge - About</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      font-family: 'Arial', sans-serif;
+      color: #e0e0e0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .retro-grain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAVSURBVBhXY2BgYGBoYGBgYGD4DwAA1wECr7L+4gAAAABJRU5ErkJggg==');
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .press-start {
+      font-family: 'Press Start 2P', cursive;
+    }
+    .neon-text {
+      text-shadow: 0 0 10px #ff6ec7, 0 0 20px #ff6ec7, 0 0 30px #00f7ff;
+    }
+    .nav-link {
+      position: relative;
+      color: #e0e0e0;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(45deg, #ff6ec7, #00f7ff);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+    .nav-link.active {
+      color: #ff6ec7;
+    }
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+    .feature-card {
+      background: rgba(26, 26, 46, 0.8);
+      border: 1px solid rgba(0, 247, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 247, 255, 0.2);
+      border-color: #ff6ec7;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const Navbar = () => {
+      return (
+        <nav className="fixed top-0 left-0 right-0 bg-gray-900 bg-opacity-90 shadow-lg z-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex justify-between items-center py-4">
+              <div className="flex items-center">
+                <a href="index.html" className="hover:opacity-80 transition-opacity">
+                  <h1 className="text-xl press-start text-[#ff6ec7] cursor-pointer">
+                    B&M Challenge
+                  </h1>
+                </a>
+              </div>
+              <div className="flex space-x-8">
+                <a href="scorecard.html" className="nav-link press-start text-sm">
+                  Scorecard
+                </a>
+                <a href="final-scores.html" className="nav-link press-start text-sm">
+                  Final Scores
+                </a>
+                <a href="rules.html" className="nav-link press-start text-sm">
+                  Game Rules
+                </a>
+                <a href="about.html" className="nav-link active press-start text-sm">
+                  About
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      );
+    };
+
+    const App = () => {
+      return (
+        <div className="min-h-screen flex flex-col items-center pt-24 p-4 relative z-10">
+          <div className="retro-grain"></div>
+          <Navbar />
+          
+          <h1 className="text-4xl md:text-6xl press-start neon-text text-center mb-8">
+            About the Game
+          </h1>
+
+          <div className="w-full max-w-4xl">
+            {/* Introduction */}
+            <div className="bg-gray-900 bg-opacity-80 rounded-lg shadow-lg p-6 mb-8">
+              <p className="text-lg leading-relaxed">
+                The Bamboo & Marbles Challenge is an exciting team-building game that combines coordination, 
+                balance, and teamwork. Originally designed for corporate team-building events and school 
+                activities, the game has evolved into a competitive sport that tests both physical and mental abilities.
+              </p>
+            </div>
+
+            {/* Features Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="feature-card rounded-lg p-6">
+                <h3 className="text-xl text-[#00f7ff] mb-4 press-start">Team Building</h3>
+                <p className="text-gray-300">
+                  Strengthens communication, coordination, and trust between team members through 
+                  collaborative challenges and shared goals.
+                </p>
+              </div>
+
+              <div className="feature-card rounded-lg p-6">
+                <h3 className="text-xl text-[#00f7ff] mb-4 press-start">Skill Development</h3>
+                <p className="text-gray-300">
+                  Enhances balance, precision, and patience while promoting strategic thinking 
+                  and problem-solving abilities.
+                </p>
+              </div>
+
+              <div className="feature-card rounded-lg p-6">
+                <h3 className="text-xl text-[#00f7ff] mb-4 press-start">Competition</h3>
+                <p className="text-gray-300">
+                  Creates healthy competition between teams while maintaining a fun and engaging 
+                  atmosphere for all participants.
+                </p>
+              </div>
+
+              <div className="feature-card rounded-lg p-6">
+                <h3 className="text-xl text-[#00f7ff] mb-4 press-start">Adaptability</h3>
+                <p className="text-gray-300">
+                  Suitable for various age groups and skill levels, making it perfect for schools, 
+                  corporate events, and community activities.
+                </p>
+              </div>
+            </div>
+
+            {/* Equipment Section */}
+            <div className="bg-gray-900 bg-opacity-80 rounded-lg shadow-lg p-6 mb-8">
+              <h2 className="text-2xl text-[#ff6ec7] mb-4 press-start">Equipment Needed(Per Team)</h2>
+              <ul className="list-disc list-inside space-y-2 text-gray-300">
+                <li>2 bamboo poles (2 meters each)</li>
+                <li>5 spoons (one per team member)</li>
+                <li>5 marbles (one per team member)</li>
+                <li>5 cups for the finish line</li>
+                <li>Obstacle course markers</li>
+                <li>Stopwatch for timing</li>
+              </ul>
+            </div>
+
+            {/* Contact Section */}
+            <div className="bg-gray-900 bg-opacity-80 rounded-lg shadow-lg p-6">
+              <h2 className="text-2xl text-[#ff6ec7] mb-4 press-start">Contact Us</h2>
+              <p className="text-gray-300 mb-4">
+                Interested in organizing a Bamboo & Marbles Challenge event? Get in touch with us for 
+                equipment rental, event organization, or custom rule modifications for your specific needs.
+              </p>
+              <div className="space-y-2">
+
+                <p className="text-gray-300">📍 Location: Prime College, Kathmandu, Nepal</p>
+              </div>
+            </div>
+          </div>
+
+          <footer className="mt-8 text-center text-gray-400">
+            <p>© 2025 Bamboo & Marbles Challenge. All rights reserved.</p>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html> 
